@@ -40,9 +40,10 @@ Needs GRUB 2.16+, EFI boot (the tuned target), a writable `/boot/grub/themes`, a
 
 ## Manual install
 
-1. From a clone of this repo, copy the **whole** directory — not just `theme.txt`:
+1. Clone the repo, then copy the **whole** theme directory — not just `theme.txt`:
 
    ```shell
+   git clone https://github.com/FeiSaMa/grub.git && cd grub
    pkexec cp -a src/catppuccin-mocha-grub-theme /boot/grub/themes/catppuccin-mocha
    ```
 
@@ -86,5 +87,4 @@ name `item_font` must match — kept there only, so there is one copy to keep in
 
 [MIT](LICENSE), © 2021-present Catppuccin and contributors; this fork keeps the same license.
 
-The bundled `src/catppuccin-mocha-grub-theme/jetbrainsmono-28.pf2` comes from JetBrains Mono (© 2020 The JetBrains Mono
-Project Authors) under the SIL Open Font License 1.1, not MIT — full text in [`src/catppuccin-mocha-grub-theme/OFL.txt`](src/catppuccin-mocha-grub-theme/OFL.txt).
+`src/catppuccin-mocha-grub-theme/jetbrainsmono-28.pf2` comes from JetBrains Mono (© 2020 The JetBrains Mono Project Authors) under the SIL Open Font License 1.1, not MIT — full text in [`src/catppuccin-mocha-grub-theme/OFL.txt`](src/catppuccin-mocha-grub-theme/OFL.txt).

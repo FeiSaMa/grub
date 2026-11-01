@@ -7,7 +7,8 @@ The theme itself is the work of the [Catppuccin org](https://github.com/catppucc
 
 ## What's different from upstream
 
-Only `src/catppuccin-mocha-grub-theme/` changes; latte, frappé and macchiato are identical to upstream.
+Only the theme **assets** change, all inside `src/catppuccin-mocha-grub-theme/`; latte, frappé and macchiato match upstream.
+This fork also adds `install.sh` and `MAINTAINING.md`, and rewrites this README — 8 paths against `upstream/main` in total.
 
 | Setting | Upstream | This fork |
 | --- | --- | --- |
@@ -29,6 +30,7 @@ pkexec ./install.sh
 
 The installer copies the whole theme directory to `/boot/grub/themes/catppuccin-mocha`, backs up
 `/etc/default/grub` to `grub.bak-<timestamp>`, rewrites `GRUB_THEME=` and runs `grub-mkconfig`.
+If it exits 1 on a `grub-mkconfig` error, the theme files and `GRUB_THEME=` may already be written: fix the cause, then rerun or run `grub-mkconfig -o /boot/grub/grub.cfg`.
 
 - `--theme-dir PATH` — install to `PATH` (absolute) instead of `/boot/grub/themes/catppuccin-mocha`
 - `--no-mkconfig` — write the files and `GRUB_THEME`, skip `grub-mkconfig`
@@ -47,13 +49,13 @@ Needs GRUB 2.16+, EFI boot (the tuned target), a writable `/boot/grub/themes`, a
    pkexec cp -a src/catppuccin-mocha-grub-theme /boot/grub/themes/catppuccin-mocha
    ```
 
-2. In `/etc/default/grub`, set `GRUB_THEME="/boot/grub/themes/catppuccin-mocha/theme.txt"` and
-   `GRUB_GFXMODE=1920x1200`.
+2. In `/etc/default/grub`, set `GRUB_THEME="/boot/grub/themes/catppuccin-mocha/theme.txt"` and `GRUB_GFXMODE=1920x1200`.
 
 3. Regenerate: `pkexec grub-mkconfig -o /boot/grub/grub.cfg`.
 
-`theme.txt` resolves assets by relative name: `background.png`, `logo.png`, `font.pf2`, `jetbrainsmono-28.pf2`, the
-`select_*.png` pixmaps and the `icons/` directory. Miss any of them and the menu loses its background, highlight bar or font.
+`theme.txt` names fonts by internal name — `terminal-font: "Unifont Regular 16"`, `item_font: "JetBrainsMono NF Regular 28"` —
+which GRUB's theme loader maps to pf2 files in the theme directory; `background.png`, `logo.png`, the `select_*.png` pixmaps
+and `icons/` resolve by relative name. Miss any of them and the menu loses its background, highlight bar or font.
 
 ## Upstream sync
 
@@ -67,15 +69,13 @@ git merge upstream/main
 
 ## Regenerating the assets
 
-See [`MAINTAINING.md`](MAINTAINING.md) for the exact `python-pillow` and `grub-mkfont` commands and the internal font
-name `item_font` must match — kept there only, so there is one copy to keep in sync.
+The `python-pillow` and `grub-mkfont` commands and the `item_font` match rule are documented only in [`MAINTAINING.md`](MAINTAINING.md).
 
 ## FAQ
 
 - **The menu is off-centre and the background looks stretched.**
 
-  The menu geometry in `theme.txt` is tuned for a 1920×1200 panel, so set `GRUB_GFXMODE=1920x1200` in
-  `/etc/default/grub` and regenerate `grub.cfg`. On a different panel, retune the geometry rather than rescaling.
+  The menu geometry in `theme.txt` is tuned for a 1920×1200 panel: set `GRUB_GFXMODE=1920x1200` in `/etc/default/grub` and regenerate `grub.cfg`; on another panel, retune rather than rescale.
 
 ## 💝 Thanks to
 

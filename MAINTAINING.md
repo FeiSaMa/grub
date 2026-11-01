@@ -1,23 +1,23 @@
 # Maintaining this fork
 
-`FeiSaMa/grub` forks [catppuccin/grub](https://github.com/catppuccin/grub) and only retunes **mocha** for a
-1920x1200 ThinkPad T14 panel: upstream's 16px font is unreadable there, the menu sits too high and its narrow
-background bands stretch. Other flavors, `README.md`, `LICENSE` and `.github/` stay untouched, so merges stay cheap.
+`FeiSaMa/grub` forks [catppuccin/grub](https://github.com/catppuccin/grub) and only retunes **mocha** for a 1920x1200
+ThinkPad T14 panel: upstream's 16px font is unreadable there, the menu sits too high and its narrow background bands
+stretch. Other flavors and `LICENSE` stay untouched, so merges stay cheap.
 
 ## What differs
 
-Inside `src/catppuccin-mocha-grub-theme/`:
+8 paths against `upstream/main`:
 
-- `theme.txt` — menu `top=550`, `width=800`, `item_height=54`, `item_spacing=12`, `selected_item_color=#B4BEFE`,
-  `item_font="JetBrainsMono NF Regular 28"`, logo `top=340 left=50%-80`, countdown `top=870`.
-- `background.png` — 1920x1200 solid `#1E1E2E`.
-- `logo.png` — 160x160, downsampled from the official 1544px mark.
-- `jetbrainsmono-28.pf2` — `grub-mkfont` bitmap; internal name `JetBrainsMono NF Regular 28` (see below).
-- `OFL.txt` — verbatim JetBrains Mono licence; no Reserved Font Name declared, family name unchanged.
-
-Plus `install.sh`: copies the whole theme dir into `/boot/grub/themes/catppuccin-mocha` (hence `OFL.txt` arrives;
-a hand-copied `/boot` tree may lack it and keep stray `theme.txt.orig`), backs up `/etc/default/grub`, rewrites
-`GRUB_THEME`; `--dry-run` writes nothing.
+- `src/catppuccin-mocha-grub-theme/theme.txt` — menu `top=550`, `width=800`, `item_height=54`, `item_spacing=12`,
+  `selected_item_color=#B4BEFE`, `item_font="JetBrainsMono NF Regular 28"`, logo `top=340`, countdown `top=870`.
+- `src/catppuccin-mocha-grub-theme/background.png` — 1920x1200 solid `#1E1E2E`.
+- `src/catppuccin-mocha-grub-theme/logo.png` — 160x160, downsampled from the official 1544px mark.
+- `src/catppuccin-mocha-grub-theme/jetbrainsmono-28.pf2` + `OFL.txt` — `grub-mkfont` bitmap (internal name
+  `JetBrainsMono NF Regular 28`) and the verbatim JetBrains Mono licence, no Reserved Font Name declared.
+- `install.sh` — whole-dir install to `/boot/grub/themes/catppuccin-mocha` (so `OFL.txt` arrives; a hand-copied
+  `/boot` tree may lack it), `/etc/default/grub` backup, `GRUB_THEME` rewrite; `--dry-run` writes nothing.
+- `README.md` + `MAINTAINING.md` — both rewritten for fork usage on purpose: on conflict keep this fork's versions.
+  Upstream's `<details>` flavor previews and its Ventoy section are intentionally dropped; see the upstream repo.
 
 ## Syncing with upstream
 

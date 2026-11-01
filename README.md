@@ -1,119 +1,90 @@
-<h3 align="center">
-  <img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/logos/exports/1544x1544_circle.png" width="100" alt="Logo"/><br/>
-  <img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/misc/transparent.png" height="30" width="0px"/>
-  Catppuccin for <a href="https://www.gnu.org/software/grub/">Grub</a>
-  <img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/misc/transparent.png" height="30" width="0px"/>
-</h3>
-<p align="center">
-  <a href="https://github.com/catppuccin/grub/stargazers"><img alt="Stargazers" src="https://img.shields.io/github/stars/catppuccin/grub?colorA=363a4f&colorB=b7bdf8&style=for-the-badge"></a>
-  <a href="https://github.com/catppuccin/grub/issues"><img src="https://img.shields.io/github/issues/catppuccin/grub?colorA=363a4f&colorB=f5a97f&style=for-the-badge"></a>
-  <a href="https://github.com/catppuccin/grub/contributors"><img src="https://img.shields.io/github/contributors/catppuccin/grub?colorA=363a4f&colorB=a6da95&style=for-the-badge"></a>
-</p>
+# Catppuccin for GRUB — personal fork (mocha, 1920×1200)
 
-<p align="center">
-  <img src="./assets/grub.png"/>
-</p>
+A personal fork of [catppuccin/grub](https://github.com/catppuccin/grub) retuning the **Mocha** flavor for a 1920×1200
+panel (ThinkPad T14 Gen 7): readable 28px menu items, a higher menu block, a background at the panel's native size.
+The theme itself is the work of the [Catppuccin org](https://github.com/catppuccin); palette, ports and docs live in
+[catppuccin/catppuccin](https://github.com/catppuccin/catppuccin) — see its [wiki](https://github.com/catppuccin/catppuccin/wiki) and [catppuccin.com/palette](https://catppuccin.com/palette).
 
-## Previews
+## What's different from upstream
 
-<details>
-<summary>🌻 Latte</summary>
-  <img src="./assets/grub-latte.png"/>
-</details>
-<details>
-<summary>🪴 Frappé</summary>
-  <img src="./assets/grub-frappe.png"/>
-</details>
-<details>
-<summary>🌺 Macchiato</summary>
-  <img src="./assets/grub-macchiato.png"/>
-</details>
-<details>
-<summary>🌿 Mocha</summary>
-  <img src="./assets/grub-mocha.png"/>
-</details>
+Only `src/catppuccin-mocha-grub-theme/` changes; latte, frappé and macchiato are identical to upstream.
 
-## Usage
+| Setting | Upstream | This fork |
+| --- | --- | --- |
+| `boot_menu` top | `60%` | `550` (px) |
+| `boot_menu` width | `480` | `800` |
+| `item_height` | `36` | `54` |
+| `item_spacing` | `10` | `12` |
+| `item_font` | `Unifont Regular 16` | `JetBrainsMono NF Regular 28` |
+| `selected_item_color` | `#CDD6F4` | `#B4BEFE` |
+| background | 640×480, stretched | 1920×1200 native, solid `#1E1E2E` |
+| logo | 100×100 | 160×160, resampled from the official 1544px mark |
+| bundled font | `font.pf2` (Unifont) only | `jetbrainsmono-28.pf2` + `OFL.txt` |
 
-1. Clone this repository locally and enter the cloned folder:
+## Install
 
-    ```shell
-    git clone https://github.com/catppuccin/grub.git && cd grub
-    ```
+```shell
+pkexec ./install.sh
+```
 
-2. Copy all or selected theme from `src` folder to
-`/usr/share/grub/themes/`. E.g. to copy all themes use:
+The installer copies the whole theme directory to `/boot/grub/themes/catppuccin-mocha`, backs up
+`/etc/default/grub` to `grub.bak-<timestamp>`, rewrites `GRUB_THEME=` and runs `grub-mkconfig`.
 
-    ```shell
-    sudo cp -r src/* /usr/share/grub/themes/
-    ```
+- `--theme-dir PATH` — install to `PATH` (absolute) instead of `/boot/grub/themes/catppuccin-mocha`
+- `--no-mkconfig` — write the files and `GRUB_THEME`, skip `grub-mkconfig`
+- `--dry-run` — print every step, write nothing, no root needed
+- `--force` — continue if the target directory exists without a `theme.txt`
+- `-h`, `--help` — show usage
 
-3. Uncomment and edit following line in `/etc/default/grub` to your selected
-   theme:
+Needs GRUB 2.16+, EFI boot (the tuned target), a writable `/boot/grub/themes`, and root for the run — `sudo` is disabled here, hence `pkexec`.
 
-    ```shell
-    GRUB_THEME="/usr/share/grub/themes/catppuccin-<flavor>-grub-theme/theme.txt"
-    ```
+## Manual install
 
-4. Update grub:
+1. From a clone of this repo, copy the **whole** directory — not just `theme.txt`:
 
-    ```shell
-    sudo grub-mkconfig -o /boot/grub/grub.cfg
-    ```
+   ```shell
+   pkexec cp -a src/catppuccin-mocha-grub-theme /boot/grub/themes/catppuccin-mocha
+   ```
 
-    For Fedora:
+2. In `/etc/default/grub`, set `GRUB_THEME="/boot/grub/themes/catppuccin-mocha/theme.txt"` and
+   `GRUB_GFXMODE=1920x1200`.
 
-    ```shell
-    sudo grub2-mkconfig -o /boot/grub2/grub.cfg
-    ```
+3. Regenerate: `pkexec grub-mkconfig -o /boot/grub/grub.cfg`.
 
-## 💿 Ventoy Support
+`theme.txt` resolves assets by relative name: `background.png`, `logo.png`, `font.pf2`, `jetbrainsmono-28.pf2`, the
+`select_*.png` pixmaps and the `icons/` directory. Miss any of them and the menu loses its background, highlight bar or font.
 
-See instructions in the [ventoy directory](ventoy/).
+## Upstream sync
 
-## 🙋 FAQ
+```shell
+git fetch upstream
+git merge upstream/main
+```
 
-- Q: **_"How can I make Grub work with my screen resolution?"_**
+`README.md` and `MAINTAINING.md` are rewritten by this fork on purpose — on conflict, keep the fork's versions.
+`theme.txt` conflicts are expected: re-apply the table above or the parameter list in [`MAINTAINING.md`](MAINTAINING.md).
 
-  A: Uncomment and edit following line in `/etc/default/grub` (modify
-  `1920x1080` to your screen resolution):
+## Regenerating the assets
 
-  ```shell
-  GRUB_GFXMODE=1920x1080
-  ```
+See [`MAINTAINING.md`](MAINTAINING.md) for the exact `python-pillow` and `grub-mkfont` commands and the internal font
+name `item_font` must match — kept there only, so there is one copy to keep in sync.
 
-  Proceed to update grub (see step 4 of the installation)
+## FAQ
 
-- Q: **_"How can I make Grub detect all my operating systems? (dual-boot)"_**
+- **The menu is off-centre and the background looks stretched.**
 
-  A: Make sure you have `os-prober` installed. Add or uncomment following line
-    in `/etc/default/grub` :
-
-  ```shell
-  GRUB_DISABLE_OS_PROBER=false
-  ```
-
-  Save that file and update grub (see step 4 of the installation)
-
-- Q: **_"How can I make Grub detect my theme?"_**
-
-  A: Make sure to **comment** the following line in `/etc/default/grub` like so:
-
-  ```shell
-  # GRUB_TERMINAL_OUTPUT="console"
-  ```
-
-  Save that file and update grub (step 4). If this did not work, try to replace
-  `/usr/share/` with `/boot/` and repeat installation steps 2-4.
+  The menu geometry in `theme.txt` is tuned for a 1920×1200 panel, so set `GRUB_GFXMODE=1920x1200` in
+  `/etc/default/grub` and regenerate `grub.cfg`. On a different panel, retune the geometry rather than rescaling.
 
 ## 💝 Thanks to
 
 - [Dooez](https://github.com/Dooez/ventoy-catppuccin)
 - [vinceliuice](https://github.com/vinceliuice/grub2-themes)
-- [tuhanayim](https://github.com/tuhanayim)
+- tuhanayim
 
-&nbsp;
+## License
 
-<p align="center"><img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/footers/gray0_ctp_on_line.svg?sanitize=true" /></p>
-<p align="center">Copyright &copy; 2021-present <a href="https://github.com/catppuccin" target="_blank">Catppuccin Org</a>
-<p align="center"><a href="https://github.com/catppuccin/catppuccin/blob/main/LICENSE"><img src="https://img.shields.io/static/v1.svg?style=for-the-badge&label=License&message=MIT&logoColor=d9e0ee&colorA=363a4f&colorB=b7bdf8"/></a></p>
+[MIT](LICENSE), © 2021-present Catppuccin and contributors; this fork keeps the same license.
+
+The bundled `src/catppuccin-mocha-grub-theme/jetbrainsmono-28.pf2` comes from JetBrains Mono (© 2020 The JetBrains Mono
+Project Authors) under the SIL Open Font License 1.1, not MIT — full text in [`src/catppuccin-mocha-grub-theme/OFL.txt`](src/catppuccin-mocha-grub-theme/OFL.txt).

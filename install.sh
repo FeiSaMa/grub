@@ -13,11 +13,14 @@ readonly SCRIPT_DIR
 readonly THEME_SRC="${SCRIPT_DIR}/src/catppuccin-mocha-grub-theme"
 readonly GRUB_DEFAULTS="/etc/default/grub"
 readonly GRUB_CFG="/boot/grub/grub.cfg"
-readonly REQUIRED_FILES=(theme.txt background.png logo.png jetbrainsmono-28.pf2)
+readonly REQUIRED_FILES=(theme.txt background.png logo.png jetbrainsmono-28.pf2 font.pf2
+  select_c.png select_e.png select_w.png)
+readonly REQUIRED_DIRS=(icons)
 
 THEME_DIR="/boot/grub/themes/catppuccin-mocha"
 DRY_RUN=0
 RUN_MKCONFIG=1
+FORCE=0
 original_args=("$@")
 
 usage() {
@@ -30,6 +33,7 @@ usage() {
 选项:
   --theme-dir PATH   安装到 PATH（默认 /boot/grub/themes/catppuccin-mocha）
   --no-mkconfig      只装文件和 GRUB_THEME，不运行 grub-mkconfig
+  --force            目标目录已存在却不含 theme.txt 时仍然继续
   --dry-run          只打印将要执行的每一步，不写任何文件、不刷新 grub.cfg
   -h, --help         显示本帮助
 
@@ -68,6 +72,10 @@ while (($#)); do
       RUN_MKCONFIG=0
       shift
       ;;
+    --force)
+      FORCE=1
+      shift
+      ;;
     --dry-run)
       DRY_RUN=1
       shift
@@ -88,10 +96,29 @@ while [[ "$THEME_DIR" == */ && "$THEME_DIR" != "/" ]]; do
 done
 [[ -n "$THEME_DIR" ]] || die "--theme-dir 不能为空"
 [[ "$THEME_DIR" == /* ]] || die "--theme-dir 需要绝对路径，收到: $THEME_DIR"
+[[ "$THEME_DIR" != "/" ]] || die "--theme-dir 不能是 /，请指定 themes 下的一个独立目录"
+
+# 解析后的目标不能等于源主题目录、也不能落在它里面（即不要把主题装回仓库自身）
+THEME_DIR_REAL="$(realpath -m -- "$THEME_DIR")"
+THEME_SRC_REAL="$(realpath -m -- "$THEME_SRC")"
+case "${THEME_DIR_REAL}/" in
+  "${THEME_SRC_REAL}/"*) die "--theme-dir 不能是主题源目录或其子目录: ${THEME_DIR}" ;;
+esac
+
+if [[ -e "$THEME_DIR" && ! -d "$THEME_DIR" ]]; then
+  die "--theme-dir 已存在且不是目录: ${THEME_DIR}"
+fi
+if [[ -d "$THEME_DIR" && ! -f "${THEME_DIR}/theme.txt" ]] && ((!FORCE)); then
+  die "目标目录不像 GRUB 主题（没有 theme.txt）: ${THEME_DIR}，确认无误请加 --force"
+fi
+
 [[ -d "$THEME_SRC" ]] || die "找不到主题源目录: $THEME_SRC"
 
 for f in "${REQUIRED_FILES[@]}"; do
   [[ -f "${THEME_SRC}/${f}" ]] || die "源主题缺少文件: ${THEME_SRC}/${f}"
+done
+for d in "${REQUIRED_DIRS[@]}"; do
+  [[ -d "${THEME_SRC}/${d}" ]] || die "源主题缺少目录: ${THEME_SRC}/${d}"
 done
 
 [[ -f "$GRUB_DEFAULTS" ]] || die "找不到 $GRUB_DEFAULTS"

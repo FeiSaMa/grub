@@ -139,13 +139,20 @@ printf '==> 目标目录: %s\n' "$THEME_DIR"
 printf '==> 写入项:   GRUB_THEME="%s"\n' "$THEME_PATH"
 
 # 1. 备份 /etc/default/grub
+# 不用 cp -a/-p：GNU cp 的 -p 同样包含 ownership（chown），目标盘若不支持
+# 属主（vfat/exfat）会 EPERM，在 set -euo pipefail 下直接中止脚本。
+# 备份只需要 mode + 时间戳，显式限定 preserve 列表即可。
 printf '==> 备份 %s -> %s\n' "$GRUB_DEFAULTS" "$BACKUP"
-run cp -a "$GRUB_DEFAULTS" "$BACKUP"
+run cp --preserve=mode,timestamps "$GRUB_DEFAULTS" "$BACKUP"
 
 # 2. 安装主题文件（整目录覆盖，不删除目标目录里已有的其它文件）
+# 必须用 cp -R 而不是 cp -a：本例的 /boot/grub 是 → /efi/grub 的符号链接，
+# 落在 vfat 分区上；vfat 没有 ownership/xattr，cp -a（--archive）内含的
+# preserve-ownership 即使以 root 运行也会 EPERM，set -e 会让脚本在
+# 「已备份、内容已拷」之后中途退出。主题文件的属主/时间戳对 GRUB 无意义。
 printf '==> 安装主题文件到 %s\n' "$THEME_DIR"
 run mkdir -p "$THEME_DIR"
-run cp -a "${THEME_SRC}/." "${THEME_DIR}/"
+run cp -R "${THEME_SRC}/." "${THEME_DIR}/"
 
 # 3. 写 GRUB_THEME：已存在的生效行 / 被注释的行 / 完全缺失三种情况
 escaped="${THEME_PATH//\\/\\\\}"
